@@ -1,0 +1,68 @@
+﻿@page "/person"
+@page "/person/{id:int}"
+@inject HttpClient Http
+
+<h1>Person</h1>
+
+@if (Id == null)
+{
+    <PageTitle>New Person</PageTitle>
+    <h3>Create new Person</h3>
+}
+else
+{
+    <PageTitle>Edit @person?.FirstName</PageTitle>
+    <h3>Edit @person?.FirstName</h3>
+}
+
+<EditForm Model="person" OnValidSubmit="SubmitPerson">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>
+        <label for="firstname">First Name</label>
+        <InputText class="form-control" id="firstname" @bind-Value = "person.FirstName"></InputText>
+    </div>
+    <div>
+        <label for="lastname">Last Name</label>
+        <InputText class="form-control" id="lastname" @bind-Value="person.LastName"></InputText>
+    </div>
+    <div>
+        <label>Sex</label>
+        <InputSelect @bind-Value="person.Sex" class="form-select">
+            @foreach (var sex in (Sex[])Enum.GetValues(typeof(Sex)))
+            {
+                <option value="@sex">@sex</option>
+            }
+        </InputSelect>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">@btnText</button>
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public int? Id { get; set; }
+
+    Person person = new();
+
+    string btnText = string.Empty;
+
+    protected override Task OnInitializedAsync()
+    {
+        btnText = Id == null ? "Save new Person" : "Save updated Person";
+        return base.OnInitializedAsync(); 
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id != null)
+            person = await Http.GetFromJsonAsync<Person>($"api/people/{Id}");
+    }
+
+    async Task SubmitPerson()
+    {
+        if (person != null)
+              await Http.PostAsJsonAsync<Person>("/api/people", person);
+    }
+}
