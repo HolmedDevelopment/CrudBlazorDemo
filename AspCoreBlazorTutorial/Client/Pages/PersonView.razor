@@ -1,6 +1,7 @@
 ﻿@page "/person"
 @page "/person/{id:int}"
 @inject HttpClient Http
+@inject IJSRuntime JSRuntime
 
 <h1>Person</h1>
 
@@ -20,7 +21,7 @@ else
     <ValidationSummary />
     <div>
         <label for="firstname">First Name</label>
-        <InputText class="form-control" id="firstname" @bind-Value = "person.FirstName"></InputText>
+        <InputText class="form-control" id="firstname" @bind-Value="person.FirstName"></InputText>
     </div>
     <div>
         <label for="lastname">Last Name</label>
@@ -37,7 +38,9 @@ else
     </div>
     <br />
     <button type="submit" class="btn btn-primary">@btnText</button>
+    <button type="button" @onclick="NextPerson" class="btn btn-primary">Next Person</button>
 </EditForm>
+
 
 @code {
 
@@ -51,7 +54,7 @@ else
     protected override Task OnInitializedAsync()
     {
         btnText = Id == null ? "Save new Person" : "Save updated Person";
-        return base.OnInitializedAsync(); 
+        return base.OnInitializedAsync();
     }
 
     protected override async Task OnParametersSetAsync()
@@ -63,6 +66,22 @@ else
     async Task SubmitPerson()
     {
         if (person != null)
-              await Http.PostAsJsonAsync<Person>("/api/people", person);
+            await Http.PostAsJsonAsync<Person>("/api/people", person);
+    }
+    async Task NextPerson()
+    {
+        try
+        {
+            if (Id != null)
+            {
+                Id = await Http.GetFromJsonAsync<int>($"/api/people/getNextId/{Id}");
+                await OnParametersSetAsync();
+            }
+        }
+        catch
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Can't navigate to next item");
+        }
+
     }
 }

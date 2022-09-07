@@ -62,6 +62,16 @@ namespace AspCoreBlazorTutorial.Server.Controllers
             return Ok(person);
         }
 
+        [HttpGet]
+        [Route("[action]/{id}")]
+        public IActionResult getNextId(int id)
+        {
+            var res = People.Select(x => x.Id).Where(x => x > id).DefaultIfEmpty().Min();
+            if (res == 0)
+                return NotFound("Last person in list");
+            return Ok(res);
+        }
+
         [HttpPost]
         public IActionResult PostPerson(Person person)
         {

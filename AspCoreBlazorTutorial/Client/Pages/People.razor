@@ -28,7 +28,7 @@
                     <td>@person.FirstName</td>
                     <td>@person.LastName</td>
                     <td>@person.Sex</td>
-                    <td><button class="btn btn-primary" @onclick="(()=>NavigateToSingle(person.Id))"><i class="oi oi-pencil"></i></button></td>
+                    <td><button class="btn btn-primary"  @onclick="(()=>NavigateToSingle(person.Id))"><i class="oi oi-pencil"></i></button></td>
                     <td><button class="btn btn-danger" @onclick="(()=>DeletePerson(person.Id))"><i class="oi oi-delete"></i></button></td>
                 </tr>
             }
